@@ -5,9 +5,6 @@
  * https://github.com/bumbleshoot/quest-tracker
  */
 
-const QUEST_TRACKER_SPREADSHEET_URL = "";
-const QUEST_TRACKER_SPREADSHEET_TAB_NAME = "Sheet1";
-
 /*************************************\
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
