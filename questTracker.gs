@@ -172,7 +172,7 @@ function createWebhook() {
 
 /**
  * doPost(e)
- * 
+ *
  * This function is called by webhooks.
  */
 let webhook;
@@ -211,8 +211,8 @@ function doPost(e) {
 
 /**
  * processTrigger()
- * 
- * Deletes temporary triggers, calls the updateQuestTracker() 
+ *
+ * Deletes temporary triggers, calls the updateQuestTracker()
  * function, and emails the user if any errors are thrown.
  */
 function processTrigger() {
@@ -239,11 +239,11 @@ function processTrigger() {
 
 /**
  * fetch(url, params)
- * 
+ *
  * Wrapper for Google Apps Script's UrlFetchApp.fetch(url, params):
  * https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchurl,-params
- * 
- * Retries failed API calls up to 2 times, retries for up to 1 min if 
+ *
+ * Retries failed API calls up to 2 times, retries for up to 1 min if
  * Habitica's servers are down, & handles Habitica's rate limiting.
  */
 let rateLimitRemaining;
@@ -251,7 +251,7 @@ let rateLimitReset;
 function fetch(url, params) {
 
   // try up to 3 times
-  for (let i=0; i<3; i++) {
+  for (let i = 0; i < 3; i++) {
 
     // if rate limit reached
     if (rateLimitRemaining != null && Number(rateLimitRemaining) < 1) {
@@ -269,9 +269,9 @@ function fetch(url, params) {
       try {
         response = UrlFetchApp.fetch(url, params);
         break;
-
+      }
       // if address unavailable, wait 5 seconds & try again
-      } catch (e) {
+      catch (e) {
         if (!webhook && e.stack.includes("Address unavailable")) {
           Utilities.sleep(5000);
         } else {
@@ -287,13 +287,13 @@ function fetch(url, params) {
     // if success, return response
     if (response.getResponseCode() < 300 || (response.getResponseCode() === 404 && (url === "https://habitica.com/api/v3/groups/party" || url.startsWith("https://habitica.com/api/v3/groups/party/members")))) {
       return response;
-
+    }
     // if rate limited due to running multiple scripts, try again
-    } else if (response.getResponseCode() === 429) {
+    else if (response.getResponseCode() === 429) {
       i--;
-
+    }
     // if 3xx or 4xx or failed 3 times, throw exception
-    } else if (response.getResponseCode() < 500 || i >= 2) {
+    else if (response.getResponseCode() < 500 || i >= 2) {
       throw new Error("Request failed for https://habitica.com returned code " + response.getResponseCode() + ". Truncated server response: " + response.getContentText());
     }
   }
@@ -301,11 +301,11 @@ function fetch(url, params) {
 
 /**
  * getQuestData()
- * 
+ *
  * Gathers relevant quest data from Habitica's API, arranges it
  * in a JavaScript Object, and returns the object.
  */
- function getQuestData() {
+function getQuestData() {
 
   console.log("Getting quest data");
 
@@ -488,8 +488,8 @@ function fetch(url, params) {
   }
 
   // compare each pair of egg quests
-  for (let i=0; i<eggQuests.length; i++) {
-    for (let j=i+1; j<eggQuests.length; j++) {
+  for (let i = 0; i < eggQuests.length; i++) {
+    for (let j = i + 1; j < eggQuests.length; j++) {
 
       // if rewards are the same
       if (eggQuests[i].rewards.map(x => JSON.stringify(x)).sort((a, b) => a.localeCompare(b)).join(",") === eggQuests[j].rewards.map(x => JSON.stringify(x)).sort((a, b) => a.localeCompare(b)).join(",")) {
@@ -523,12 +523,12 @@ function fetch(url, params) {
 
 /**
  * updateQuestTracker()
- * 
- * Updates the Quest Tracker spreadsheet, which shows how many 
- * quest completions are needed by each party member for every 
- * quest in Habitica. Also shows total quest completion 
+ *
+ * Updates the Quest Tracker spreadsheet, which shows how many
+ * quest completions are needed by each party member for every
+ * quest in Habitica. Also shows total quest completion
  * percentages for each party member and quest.
- * 
+ *
  * Run this function on the questFinished webhook.
  */
 function updateQuestTracker() {
@@ -543,9 +543,9 @@ function updateQuestTracker() {
       console.log("ERROR: QUEST_TRACKER_SPREADSHEET_TAB_NAME \"" + QUEST_TRACKER_SPREADSHEET_TAB_NAME + "\" doesn't exit.");
       return;
     }
-
+  }
   // if spreadsheet doesn't exist, print error & exit
-  } catch (e) {
+  catch (e) {
     if (e.stack.includes("Unexpected error while getting the method or property openById on object SpreadsheetApp")) {
       console.log("ERROR: QUEST_TRACKER_SPREADSHEET_URL not found: " + QUEST_TRACKER_SPREADSHEET_URL);
       return;
@@ -591,7 +591,7 @@ function updateQuestTracker() {
   });
 
   // print headings (usernames and TOTAL)
-  sheet.getRange(2, 3, 1, usernames.length+1).setValues([["TOTAL"].concat(usernames)]).setHorizontalAlignment("center").setFontWeight("bold");
+  sheet.getRange(2, 3, 1, usernames.length + 1).setValues([["TOTAL"].concat(usernames)]).setHorizontalAlignment("center").setFontWeight("bold");
 
   // print categories
   let firstEmptyRow = 3;
@@ -620,18 +620,18 @@ function updateQuestTracker() {
 
   // for each quest
   let sumUsersPercentComplete = 0;
-  for (let i=0; i<quests.length; i++) {
+  for (let i = 0; i < quests.length; i++) {
 
     // print quest reward or name
     let reward = quests[i].rewards[0];
     if (i < questData.eggQuests.length) {
-      sheet.getRange(i+3, 2).setValue(reward.name.substring(0, reward.name.length - 4));
+      sheet.getRange(i + 3, 2).setValue(reward.name.substring(0, reward.name.length - 4));
     } else if (i < questData.eggQuests.length + questData.hatchingPotionQuests.length) {
-      sheet.getRange(i+3, 2).setValue(reward.name.substring(0, reward.name.length - 16));
+      sheet.getRange(i + 3, 2).setValue(reward.name.substring(0, reward.name.length - 16));
     } else if (i < questData.eggQuests.length + questData.hatchingPotionQuests.length + questData.petQuests.length) {
-      sheet.getRange(i+3, 2).setValue(reward.name);
+      sheet.getRange(i + 3, 2).setValue(reward.name);
     } else {
-      sheet.getRange(i+3, 2).setValue(quests[i].name.split(":")[0].replace(/^The /, "").replace(", Part", ""));
+      sheet.getRange(i + 3, 2).setValue(quests[i].name.split(":")[0].replace(/^The /, "").replace(", Part", ""));
     }
 
     // get completions for each member
@@ -645,12 +645,12 @@ function updateQuestTracker() {
     // for each member
     let totalQuestCompletions = 0;
     let totalQuestCompletionsNeeded = 0;
-    for (let j=0; j<completedIndividual.length; j++) {
+    for (let j = 0; j < completedIndividual.length; j++) {
 
       // print completions/completions needed
       let numCompletions = completedIndividual[j][1];
       let completionsNeeded = quests[i].neededIndividual;
-      let cell = sheet.getRange(i+3, j+4);
+      let cell = sheet.getRange(i + 3, j + 4);
       cell.setValue(numCompletions + "/" + completionsNeeded).setHorizontalAlignment("center").setFontStyle("normal");
       if (numCompletions >= completionsNeeded) {
         cell.setBackground("#b6d7a8");
@@ -666,7 +666,7 @@ function updateQuestTracker() {
 
       // add percentage to TOTAL row
       totals[j] += numCompletions / completionsNeeded;
-      if (i == quests.length-1) {
+      if (i == quests.length - 1) {
         let userPercentComplete = totals[j] / quests.length * 100;
         totals[j] = Math.floor(userPercentComplete) + "%";
         sumUsersPercentComplete += userPercentComplete;
@@ -674,29 +674,29 @@ function updateQuestTracker() {
     }
 
     // print TOTAL column
-    sheet.getRange(i+3, 3).setValue(Math.floor(totalQuestCompletions / totalQuestCompletionsNeeded * 100) + "%").setHorizontalAlignment("center").setFontStyle("normal");
+    sheet.getRange(i + 3, 3).setValue(Math.floor(totalQuestCompletions / totalQuestCompletionsNeeded * 100) + "%").setHorizontalAlignment("center").setFontStyle("normal");
   }
 
   // print TOTAL row
-  sheet.getRange(sheet.getLastRow()+1, 2).setValue("TOTAL");
+  sheet.getRange(sheet.getLastRow() + 1, 2).setValue("TOTAL");
   sheet.getRange(sheet.getLastRow(), 3).setValue(Math.floor(sumUsersPercentComplete / usernames.length) + "%").setHorizontalAlignment("center").setFontStyle("normal");
   sheet.getRange(sheet.getLastRow(), 4, 1, totals.length).setValues([totals]).setHorizontalAlignment("center").setFontStyle("normal");
 
   // print last updated
-  sheet.getRange(sheet.getLastRow()+2, 3, 1, 1).setHorizontalAlignment("left").setFontStyle("italic").setValues([["Last updated: " + new Date().toUTCString()]]);
+  sheet.getRange(sheet.getLastRow() + 2, 3, 1, 1).setHorizontalAlignment("left").setFontStyle("italic").setValues([["Last updated: " + new Date().toUTCString()]]);
 }
 
 /**
  * getUser(updated)
- * 
- * Fetches user data from the Habitica API if it hasn't already 
- * been fetched during this execution, or if updated is set to 
+ *
+ * Fetches user data from the Habitica API if it hasn't already
+ * been fetched during this execution, or if updated is set to
  * true.
  */
 let user;
 function getUser(updated) {
   if (updated || typeof user === "undefined") {
-    for (let i=0; i<3; i++) {
+    for (let i = 0; i < 3; i++) {
       user = fetch("https://habitica.com/api/v3/user", GET_PARAMS);
       try {
         user = JSON.parse(user).data;
@@ -718,9 +718,9 @@ function getUser(updated) {
 
 /**
  * getParty(updated)
- * 
- * Fetches party data from the Habitica API if it hasn't already 
- * been fetched during this execution, or if updated is set to 
+ *
+ * Fetches party data from the Habitica API if it hasn't already
+ * been fetched during this execution, or if updated is set to
  * true.
  */
 let party;
@@ -733,15 +733,15 @@ function getParty(updated) {
 
 /**
  * getMembers(updated)
- * 
- * Fetches party member data from the Habitica API if it hasn't 
- * already been fetched during this execution, or if updated is 
+ *
+ * Fetches party member data from the Habitica API if it hasn't
+ * already been fetched during this execution, or if updated is
  * set to true.
  */
 let members;
 function getMembers(updated) {
   if (updated || typeof members === "undefined") {
-    for (let i=0; i<3; i++) {
+    for (let i = 0; i < 3; i++) {
       members = fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS);
       try {
         members = JSON.parse(members).data;
@@ -760,15 +760,15 @@ function getMembers(updated) {
 
 /**
  * getContent(updated)
- * 
- * Fetches content data from the Habitica API if it hasn't already 
- * been fetched during this execution, or if updated is set to 
+ *
+ * Fetches content data from the Habitica API if it hasn't already
+ * been fetched during this execution, or if updated is set to
  * true.
  */
 let content;
 function getContent(updated) {
   if (updated || typeof content === "undefined") {
-    for (let i=0; i<3; i++) {
+    for (let i = 0; i < 3; i++) {
       content = fetch("https://habitica.com/api/v3/content", GET_PARAMS);
       try {
         content = JSON.parse(content).data;
