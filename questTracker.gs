@@ -82,68 +82,6 @@ function processTrigger() {
 }
 
 /**
- * fetch(url, params)
- *
- * Wrapper for Google Apps Script's UrlFetchApp.fetch(url, params):
- * https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchurl,-params
- *
- * Retries failed API calls up to 2 times, retries for up to 1 min if
- * Habitica's servers are down, & handles Habitica's rate limiting.
- */
-let rateLimitRemaining;
-let rateLimitReset;
-function fetch(url, params) {
-
-  // try up to 3 times
-  for (let i = 0; i < 3; i++) {
-
-    // if rate limit reached
-    if (rateLimitRemaining != null && Number(rateLimitRemaining) < 1) {
-
-      // wait until rate limit reset
-      let waitUntil = new Date(rateLimitReset);
-      waitUntil.setSeconds(waitUntil.getSeconds() + 1);
-      let now = new Date();
-      Utilities.sleep(Math.max(waitUntil.getTime() - now.getTime(), 0));
-    }
-
-    // call API
-    let response;
-    while (true) {
-      try {
-        response = UrlFetchApp.fetch(url, params);
-        break;
-      }
-      // if address unavailable, wait 5 seconds & try again
-      catch (e) {
-        if (!webhook && e.stack.includes("Address unavailable")) {
-          Utilities.sleep(5000);
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    // store rate limiting data
-    rateLimitRemaining = response.getHeaders()["x-ratelimit-remaining"];
-    rateLimitReset = response.getHeaders()["x-ratelimit-reset"];
-
-    // if success, return response
-    if (response.getResponseCode() < 300 || (response.getResponseCode() === 404 && (url === "https://habitica.com/api/v3/groups/party" || url.startsWith("https://habitica.com/api/v3/groups/party/members")))) {
-      return response;
-    }
-    // if rate limited due to running multiple scripts, try again
-    else if (response.getResponseCode() === 429) {
-      i--;
-    }
-    // if 3xx or 4xx or failed 3 times, throw exception
-    else if (response.getResponseCode() < 500 || i >= 2) {
-      throw new Error("Request failed for https://habitica.com returned code " + response.getResponseCode() + ". Truncated server response: " + response.getContentText());
-    }
-  }
-}
-
-/**
  * getQuestData()
  *
  * Gathers relevant quest data from Habitica's API, arranges it
