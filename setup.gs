@@ -24,8 +24,8 @@ const API_TOKEN = "PasteYourApiTokenHere";
 // [Authors] Place your user ID and script name here
 // - This is used for the "X-Client" HTTP header
 // - See https://habitica.fandom.com/wiki/Guidance_for_Comrades#X-Client_Header
-const AUTHOR_ID = "PasteAuthorUserIdHere";
-const SCRIPT_NAME = "TypeScriptNameHere";
+const AUTHOR_ID = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";
+const SCRIPT_NAME = "QuestTracker";
 
 // [Authors] Add global variables here
 // - Note that these do not persist in between script calls

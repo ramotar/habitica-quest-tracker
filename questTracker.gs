@@ -5,30 +5,12 @@
  * https://github.com/bumbleshoot/quest-tracker
  */
 
-const USER_ID = "";
-const API_TOKEN = "";
-const WEB_APP_URL = "";
-
 const QUEST_TRACKER_SPREADSHEET_URL = "";
 const QUEST_TRACKER_SPREADSHEET_TAB_NAME = "Sheet1";
 
 /*************************************\
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
-
-const PARAMS = {
-  "headers": {
-    "x-api-user": USER_ID, 
-    "x-api-key": API_TOKEN,
-    "x-client": "35c3fb6f-fb98-4bc3-b57a-ac01137d0847-QuestTracker"
-  },
-  "muteHttpExceptions": true
-};
-const GET_PARAMS = Object.assign({ "method": "get" }, PARAMS);
-const POST_PARAMS = Object.assign({ "method": "post" }, PARAMS);
-const DELETE_PARAMS = Object.assign({ "method": "delete" }, PARAMS);
-
-const scriptProperties = PropertiesService.getScriptProperties();
 
 function install() {
 
