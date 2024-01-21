@@ -176,6 +176,36 @@ function validateOptions() {
   // test credentials
   if (valid) {
     valid = testCredentials();
+
+    if (api_getParty().leader.id !== INT_USER_ID) {
+      logWarning("Quest Tracker should only be run by one party member (preferably the party leader).");
+    }
+  }
+
+  if (typeof QUEST_TRACKER_SPREADSHEET_URL !== "string" || !QUEST_TRACKER_SPREADSHEET_URL.startsWith("https://docs.google.com/spreadsheets/d/") || QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/) === null) {
+    logError("QUEST_TRACKER_SPREADSHEET_URL must equal the URL of the Google Sheet that contains the Quest Tracker tab. You can copy this URL from your address bar while viewing the spreadsheet in a web browser.\n\neg. const QUEST_TRACKER_SPREADSHEET_URL = \"https://docs.google.com/spreadsheets/d/1YbiVoNxP6q08KFPY01ARa3bNv8MDhBtRx41fBqPWN2o\";");
+    valid = false;
+  }
+  else {
+    try {
+      var questTrackerSpreadsheet = SpreadsheetApp.openById(QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
+    } catch (error) {
+      if (error.stack.includes("Unexpected error while getting the method or property openById on object SpreadsheetApp")) {
+        logError("QUEST_TRACKER_SPREADSHEET_URL not found: " + QUEST_TRACKER_SPREADSHEET_URL);
+        valid = false;
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  if (typeof QUEST_TRACKER_SPREADSHEET_TAB_NAME !== "string" || QUEST_TRACKER_SPREADSHEET_TAB_NAME == "") {
+    logError("QUEST_TRACKER_SPREADSHEET_TAB_NAME must equal the name of the Quest Tracker tab.\n\neg. const QUEST_TRACKER_SPREADSHEET_TAB_NAME = \"Quest Tracker\";");
+    valid = false;
+  }
+  else if (typeof questTrackerSpreadsheet !== "undefined" && questTrackerSpreadsheet.getSheetByName(QUEST_TRACKER_SPREADSHEET_TAB_NAME) === null) {
+    logError("QUEST_TRACKER_SPREADSHEET_TAB_NAME \"" + QUEST_TRACKER_SPREADSHEET_TAB_NAME + "\" doesn't exist.");
+    valid = false;
   }
 
   if (!valid) {
@@ -189,7 +219,7 @@ function testCredentials() {
   // [Authors] This function tests the user credentials
 
   try {
-    api_getUser();
+    api_getParty(true);
   }
   catch (error) {
     if (error.message.startsWith("Request failed") && error.cause.getResponseCode() == 401) {
