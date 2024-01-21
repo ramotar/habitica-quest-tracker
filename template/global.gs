@@ -40,10 +40,24 @@ function doPost(event) {
     // Process the webhook
     processWebhookInstant(type, dataContents);
 
-    // Create a trigger for delayed processing
-    var trigger = ScriptApp.newTrigger('doPostTriggered').timeBased().after(1).create();
+    // Check for an existing trigger
+    let triggerId;
+    let triggers = ScriptApp.getProjectTriggers();
+    for (let trigger of triggers) {
+      if (trigger.getHandlerFunction() === "doPostTriggered") {
+        triggerId = trigger.getUniqueId();
+        break;
+      }
+    }
+
+    if (triggerId === undefined) {
+      // Create a trigger for delayed processing
+      var trigger = ScriptApp.newTrigger("doPostTriggered").timeBased().after(1).create();
+      triggerId = trigger.getUniqueId();
+    }
+    // Set or update script cache
     CacheService.getScriptCache().put(
-      trigger.getUniqueId(),
+      triggerId,
       event.postData.contents
     );
   }
