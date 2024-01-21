@@ -97,12 +97,14 @@ function createTriggers() {
   // - Below you find an example trigger, that recurs every hour
   // - Feel free to modify this trigger or add additional triggers
 
+  /*
   logInfo("Creating triggers");
 
   ScriptApp.newTrigger("processTrigger")
     .timeBased()
     .everyHours(1)
     .create();
+  */
 }
 
 function createWebhooks() {
@@ -113,9 +115,9 @@ function createWebhooks() {
   logInfo("Creating webhooks");
 
   let webhookData = {
-    "type": "taskActivity",
+    "type": "questActivity",
     "options": {
-      "scored": true
+      "questFinished": true
     }
   }
   api_createWebhook(webhookData);
