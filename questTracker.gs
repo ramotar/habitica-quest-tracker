@@ -12,6 +12,8 @@ const QUEST_TRACKER_SPREADSHEET_TAB_NAME = "Sheet1";
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
 
+let members;
+
 function install() {
 
   // if settings are valid
@@ -56,7 +58,7 @@ function validateConstants() {
 
   if (valid) {
     try {
-      if (getParty().leader.id !== USER_ID) {
+      if (api_getParty().leader.id !== USER_ID) {
         console.log("WARNING: Quest Tracker should only be run by one party member (preferably the party leader).");
       }
     } catch (e) {
@@ -336,15 +338,15 @@ function getQuestData() {
 
   // get lists of premium eggs, premium hatching potions & wacky hatching potions
   let premiumEggs = [];
-  for (let egg of Object.values(getContent().questEggs)) {
+  for (let egg of Object.values(api_getContent().questEggs)) {
     premiumEggs.push(egg.key);
   }
   let premiumHatchingPotions = [];
-  for (let potion of Object.values(content.premiumHatchingPotions)) {
+  for (let potion of Object.values(api_getContent().premiumHatchingPotions)) {
     premiumHatchingPotions.push(potion.key);
   }
   let wackyHatchingPotions = [];
-  for (let potion of Object.values(content.wackyHatchingPotions)) {
+  for (let potion of Object.values(api_getContent().wackyHatchingPotions)) {
     wackyHatchingPotions.push(potion.key);
   }
 
@@ -357,7 +359,7 @@ function getQuestData() {
   let achievementQuests = [];
 
   // for each quest
-  for (let quest of Object.values(content.quests)) {
+  for (let quest of Object.values(api_getContent().quests)) {
 
     // if world boss, skip it
     if (quest.category == "world") {
@@ -374,7 +376,7 @@ function getQuestData() {
         let rewardType = "";
 
         if (drop.type == "eggs" && premiumEggs.includes(drop.key)) {
-          rewardName = content.eggs[drop.key].text + " Egg";
+          rewardName = api_getContent().eggs[drop.key].text + " Egg";
           rewardType = "egg";
         } else if (drop.type == "hatchingPotions" && premiumHatchingPotions.includes(drop.key)) {
           rewardType = "hatchingPotion";
@@ -537,8 +539,9 @@ function updateQuestTracker() {
   }
 
   // if no party, party = user
-  if (typeof getMembers() === "undefined") {
-    members = [getUser()];
+  members = api_getPartyMembers();
+  if (typeof members === "undefined") {
+    members = [api_getUser()];
   }
 
   // get quest data
@@ -666,103 +669,4 @@ function updateQuestTracker() {
 
   // print last updated
   sheet.getRange(sheet.getLastRow() + 2, 3, 1, 1).setHorizontalAlignment("left").setFontStyle("italic").setValues([["Last updated: " + new Date().toUTCString()]]);
-}
-
-/**
- * getUser(updated)
- *
- * Fetches user data from the Habitica API if it hasn't already
- * been fetched during this execution, or if updated is set to
- * true.
- */
-let user;
-function getUser(updated) {
-  if (updated || typeof user === "undefined") {
-    for (let i = 0; i < 3; i++) {
-      user = fetch("https://habitica.com/api/v3/user", GET_PARAMS);
-      try {
-        user = JSON.parse(user).data;
-        if (typeof user.party?._id !== "undefined") {
-          scriptProperties.setProperty("PARTY_ID", user.party._id);
-        }
-        break;
-      } catch (e) {
-        if (i < 2 && (e.stack.includes("Unterminated string in JSON") || e.stack.includes("Expected ',' or '}' after property value in JSON at position") || e.stack.includes("Expected double-quoted property name in JSON at position"))) {
-          continue;
-        } else {
-          throw e;
-        }
-      }
-    }
-  }
-  return user;
-}
-
-/**
- * getParty(updated)
- *
- * Fetches party data from the Habitica API if it hasn't already
- * been fetched during this execution, or if updated is set to
- * true.
- */
-let party;
-function getParty(updated) {
-  if (updated || typeof party === "undefined") {
-    party = JSON.parse(fetch("https://habitica.com/api/v3/groups/party", GET_PARAMS)).data;
-  }
-  return party;
-}
-
-/**
- * getMembers(updated)
- *
- * Fetches party member data from the Habitica API if it hasn't
- * already been fetched during this execution, or if updated is
- * set to true.
- */
-let members;
-function getMembers(updated) {
-  if (updated || typeof members === "undefined") {
-    for (let i = 0; i < 3; i++) {
-      members = fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS);
-      try {
-        members = JSON.parse(members).data;
-        break;
-      } catch (e) {
-        if (i < 2 && (e.stack.includes("Unterminated string in JSON") || e.stack.includes("Expected ',' or '}' after property value in JSON at position") || e.stack.includes("Expected double-quoted property name in JSON at position"))) {
-          continue;
-        } else {
-          throw e;
-        }
-      }
-    }
-  }
-  return members;
-}
-
-/**
- * getContent(updated)
- *
- * Fetches content data from the Habitica API if it hasn't already
- * been fetched during this execution, or if updated is set to
- * true.
- */
-let content;
-function getContent(updated) {
-  if (updated || typeof content === "undefined") {
-    for (let i = 0; i < 3; i++) {
-      content = fetch("https://habitica.com/api/v3/content", GET_PARAMS);
-      try {
-        content = JSON.parse(content).data;
-        break;
-      } catch (e) {
-        if (i < 2 && (e.stack.includes("Unterminated string in JSON") || e.stack.includes("Expected ',' or '}' after property value in JSON at position") || e.stack.includes("Expected double-quoted property name in JSON at position"))) {
-          continue;
-        } else {
-          throw e;
-        }
-      }
-    }
-  }
-  return content;
 }
