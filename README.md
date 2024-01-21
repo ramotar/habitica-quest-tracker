@@ -52,7 +52,7 @@ It is highly recommended that you use a desktop computer for this, as some of th
 5. Follow the [Setup Instructions](#setup-instructions) above. You don't have to make a new Quest Tracker spreadsheet, just use your existing one.
 
 ## Contact
-❔ Questions: [https://github.com/bumbleshoot/quest-tracker/discussions/categories/q-a](https://github.com/bumbleshoot/quest-tracker/discussions/categories/q-a)  
-💡 Suggestions: [https://github.com/bumbleshoot/quest-tracker/discussions/categories/suggestions](https://github.com/bumbleshoot/quest-tracker/discussions/categories/suggestions)  
-🐞 Report a bug: [https://github.com/bumbleshoot/quest-tracker/issues](https://github.com/bumbleshoot/quest-tracker/issues)  
+❔ Questions: [https://github.com/bumbleshoot/quest-tracker/discussions/categories/q-a](https://github.com/bumbleshoot/quest-tracker/discussions/categories/q-a)
+💡 Suggestions: [https://github.com/bumbleshoot/quest-tracker/discussions/categories/suggestions](https://github.com/bumbleshoot/quest-tracker/discussions/categories/suggestions)
+🐞 Report a bug: [https://github.com/bumbleshoot/quest-tracker/issues](https://github.com/bumbleshoot/quest-tracker/issues)
 💗 Donate: [https://github.com/sponsors/bumbleshoot](https://github.com/sponsors/bumbleshoot)
