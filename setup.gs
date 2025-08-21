@@ -1,3 +1,12 @@
+/**
+ * Quest Tracker v1.0.0 by John Doe
+ *
+ * a port of Quest Tracker by bumbleshoot
+ *
+ * See Wiki page for info & setup instructions:
+ * https://habitica.fandom.com/wiki/Habitica_GAS_Template
+ */
+
 /* ========================================== */
 /* [Users] Required script data to fill in    */
 /* ========================================== */

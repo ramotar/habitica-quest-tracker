@@ -1,7 +1,6 @@
 /**
+ * Functionality ported from
  * Quest Tracker v1.0.17 (beta) by @bumbleshoot
- *
- * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/quest-tracker
  */
 
