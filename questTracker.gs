@@ -9,15 +9,13 @@
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
 
-let members;
-
 /**
  * getQuestData()
  *
  * Gathers relevant quest data from Habitica's API, arranges it
  * in a JavaScript Object, and returns the object.
  */
-function getQuestData() {
+function getQuestData(members) {
 
   console.log("Getting quest data");
 
@@ -267,13 +265,13 @@ function updateQuestTracker() {
   }
 
   // if no party, party = user
-  members = api_getPartyMembers();
+  let members = api_getPartyMembers();
   if (typeof members === "undefined") {
     members = [api_getUser()];
   }
 
   // get quest data
-  let questData = getQuestData();
+  let questData = getQuestData(members);
 
   // sort egg, hatching potion, & pet quests alphabetically by reward name
   questData.eggQuests.sort((a, b) => {
