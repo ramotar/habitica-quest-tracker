@@ -35,7 +35,7 @@ const SPREADSHEET_TAB_NAME = "Sheet1";
 // [Authors] Place your user ID and script name here
 // - This is used for the "X-Client" HTTP header
 // - See https://habitica.fandom.com/wiki/Guidance_for_Comrades#X-Client_Header
-const AUTHOR_ID = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";
+const AUTHOR_ID = "b477462a-5bb5-4040-9505-f0b049b4f0bb";
 const SCRIPT_NAME = "QuestTracker";
 
 // [Authors] Add global variables here
