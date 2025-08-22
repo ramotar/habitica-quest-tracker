@@ -96,15 +96,6 @@ function createTriggers() {
   // [Authors] This function is used to create your necessary triggers
   // - Below you find an example trigger, that recurs every hour
   // - Feel free to modify this trigger or add additional triggers
-
-  /*
-  logInfo("Creating triggers");
-
-  ScriptApp.newTrigger("processTrigger")
-    .timeBased()
-    .everyHours(1)
-    .create();
-  */
 }
 
 function createWebhooks() {
