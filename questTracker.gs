@@ -241,27 +241,11 @@ function getQuestData(members) {
  * Run this function on the questFinished webhook.
  */
 function updateQuestTracker() {
+  if (!validateOptions()) return;
 
   // open spreadsheet & sheet
-  try {
-    var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
-    var sheet = spreadsheet.getSheetByName(SPREADSHEET_TAB_NAME);
-
-    // if sheet doesn't exist, print error & exit
-    if (sheet === null) {
-      console.log("ERROR: SPREADSHEET_TAB_NAME \"" + SPREADSHEET_TAB_NAME + "\" doesn't exit.");
-      return;
-    }
-  }
-  // if spreadsheet doesn't exist, print error & exit
-  catch (e) {
-    if (e.stack.includes("Unexpected error while getting the method or property openById on object SpreadsheetApp")) {
-      console.log("ERROR: SPREADSHEET_URL not found: " + SPREADSHEET_URL);
-      return;
-    } else {
-      throw e;
-    }
-  }
+  let spreadsheet = SpreadsheetApp.openById(QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
+  let sheet = spreadsheet.getSheetByName(QUEST_TRACKER_SPREADSHEET_TAB_NAME);
 
   // if no party, party = user
   let members = api_getPartyMembers();

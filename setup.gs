@@ -180,7 +180,7 @@ function validateOptions() {
     valid = testCredentials();
 
     if (api_getParty().leader.id !== INT_USER_ID) {
-      logWarning("Quest Tracker should only be run by one party member (preferably the party leader).");
+      logInfo("Quest Tracker should only be run by one party member (preferably the party leader).");
     }
   }
 
@@ -206,8 +206,8 @@ function validateOptions() {
     valid = false;
   }
   else if (typeof spreadsheet !== "undefined" && spreadsheet.getSheetByName(SPREADSHEET_TAB_NAME) === null) {
-    logError("SPREADSHEET_TAB_NAME \"" + SPREADSHEET_TAB_NAME + "\" doesn't exist.");
-    valid = false;
+    spreadsheet.insertSheet(SPREADSHEET_TAB_NAME);
+    logWarning("SPREADSHEET_TAB_NAME \"" + SPREADSHEET_TAB_NAME + "\" didn't exist and was created.");
   }
 
   if (!valid) {
@@ -221,7 +221,7 @@ function testCredentials() {
   // [Authors] This function tests the user credentials
 
   try {
-    api_getParty(true);
+    api_getPartyMembers();
   }
   catch (error) {
     if (error.message.startsWith("Request failed") && error.cause.getResponseCode() == 401) {
