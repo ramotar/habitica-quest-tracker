@@ -244,8 +244,8 @@ function updateQuestTracker() {
   if (!validateOptions()) return;
 
   // open spreadsheet & sheet
-  let spreadsheet = SpreadsheetApp.openById(QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
-  let sheet = spreadsheet.getSheetByName(QUEST_TRACKER_SPREADSHEET_TAB_NAME);
+  let spreadsheet = SpreadsheetApp.openById(SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
+  let sheet = spreadsheet.getSheetByName(SPREADSHEET_TAB_NAME);
 
   // if no party, party = user
   let members = api_getPartyMembers();

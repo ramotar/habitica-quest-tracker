@@ -1,5 +1,5 @@
 /**
- * Quest Tracker v1.0.0 by John Doe
+ * Quest Tracker v1.0.1 by Turac Ramotar
  *
  * a port of Quest Tracker by bumbleshoot
  *
