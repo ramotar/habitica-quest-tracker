@@ -1,3 +1,12 @@
+/**
+ * Quest Tracker v1.0.0 by John Doe
+ *
+ * a port of Quest Tracker by bumbleshoot
+ *
+ * See Wiki page for info & setup instructions:
+ * https://habitica.fandom.com/wiki/Habitica_GAS_Template
+ */
+
 /* ========================================== */
 /* [Users] Required script data to fill in    */
 /* ========================================== */
@@ -10,6 +19,8 @@ const API_TOKEN = "PasteYourApiTokenHere";
 /* ========================================== */
 // [Authors] Place all mandatory user-modified variables here
 // - e.g. skill to use, number of times to use, task to use skill on, etc.
+const SPREADSHEET_URL = "PasteYourUrlHere";
+const SPREADSHEET_TAB_NAME = "Sheet1";
 
 /* ========================================== */
 /* [Users] Optional customizations to fill in */
@@ -24,7 +35,7 @@ const API_TOKEN = "PasteYourApiTokenHere";
 // [Authors] Place your user ID and script name here
 // - This is used for the "X-Client" HTTP header
 // - See https://habitica.fandom.com/wiki/Guidance_for_Comrades#X-Client_Header
-const AUTHOR_ID = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";
+const AUTHOR_ID = "b477462a-5bb5-4040-9505-f0b049b4f0bb";
 const SCRIPT_NAME = "QuestTracker";
 
 // [Authors] Add global variables here
@@ -96,15 +107,6 @@ function createTriggers() {
   // [Authors] This function is used to create your necessary triggers
   // - Below you find an example trigger, that recurs every hour
   // - Feel free to modify this trigger or add additional triggers
-
-  /*
-  logInfo("Creating triggers");
-
-  ScriptApp.newTrigger("processTrigger")
-    .timeBased()
-    .everyHours(1)
-    .create();
-  */
 }
 
 function createWebhooks() {
@@ -140,19 +142,17 @@ function deleteTriggers() {
 function deleteWebhooks() {
   // [Authors] This function deletes all existing webhooks to your script
 
-  let response = api_fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS);
-  let obj = parseJSON(response);
-  let webhooks = obj.data;
+  let webhooks = api_getWebhooks();
 
   if (webhooks.length > 0) {
 
-    console.log("Deleting webhooks");
+    logInfo("Deleting webhooks");
 
     let webAppURL = getWebAppURL();
 
     for (let webhook of webhooks) {
       if (webhook.url == webAppURL) {
-        api_fetch("https://habitica.com/api/v3/user/webhook/" + webhook.id, DELETE_PARAMS);
+        api_deleteWebhook(webhook.id);
       }
     }
   }
@@ -180,20 +180,20 @@ function validateOptions() {
     valid = testCredentials();
 
     if (api_getParty().leader.id !== INT_USER_ID) {
-      logWarning("Quest Tracker should only be run by one party member (preferably the party leader).");
+      logInfo("Quest Tracker should only be run by one party member (preferably the party leader).");
     }
   }
 
-  if (typeof QUEST_TRACKER_SPREADSHEET_URL !== "string" || !QUEST_TRACKER_SPREADSHEET_URL.startsWith("https://docs.google.com/spreadsheets/d/") || QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/) === null) {
-    logError("QUEST_TRACKER_SPREADSHEET_URL must equal the URL of the Google Sheet that contains the Quest Tracker tab. You can copy this URL from your address bar while viewing the spreadsheet in a web browser.\n\neg. const QUEST_TRACKER_SPREADSHEET_URL = \"https://docs.google.com/spreadsheets/d/1YbiVoNxP6q08KFPY01ARa3bNv8MDhBtRx41fBqPWN2o\";");
+  if (typeof SPREADSHEET_URL !== "string" || !SPREADSHEET_URL.startsWith("https://docs.google.com/spreadsheets/d/") || SPREADSHEET_URL.match(/[^\/]{44}/) === null) {
+    logError("SPREADSHEET_URL must equal the URL of the Google Sheet that contains the Quest Tracker tab. You can copy this URL from your address bar while viewing the spreadsheet in a web browser.\n\neg. const SPREADSHEET_URL = \"https://docs.google.com/spreadsheets/d/1YbiVoNxP6q08KFPY01ARa3bNv8MDhBtRx41fBqPWN2o\";");
     valid = false;
   }
   else {
     try {
-      var questTrackerSpreadsheet = SpreadsheetApp.openById(QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
+      var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
     } catch (error) {
       if (error.stack.includes("Unexpected error while getting the method or property openById on object SpreadsheetApp")) {
-        logError("QUEST_TRACKER_SPREADSHEET_URL not found: " + QUEST_TRACKER_SPREADSHEET_URL);
+        logError("SPREADSHEET_URL not found: " + SPREADSHEET_URL);
         valid = false;
       } else {
         throw e;
@@ -201,17 +201,17 @@ function validateOptions() {
     }
   }
 
-  if (typeof QUEST_TRACKER_SPREADSHEET_TAB_NAME !== "string" || QUEST_TRACKER_SPREADSHEET_TAB_NAME == "") {
-    logError("QUEST_TRACKER_SPREADSHEET_TAB_NAME must equal the name of the Quest Tracker tab.\n\neg. const QUEST_TRACKER_SPREADSHEET_TAB_NAME = \"Quest Tracker\";");
+  if (typeof SPREADSHEET_TAB_NAME !== "string" || SPREADSHEET_TAB_NAME == "") {
+    logError("SPREADSHEET_TAB_NAME must equal the name of the Quest Tracker tab.\n\neg. const SPREADSHEET_TAB_NAME = \"Quest Tracker\";");
     valid = false;
   }
-  else if (typeof questTrackerSpreadsheet !== "undefined" && questTrackerSpreadsheet.getSheetByName(QUEST_TRACKER_SPREADSHEET_TAB_NAME) === null) {
-    logError("QUEST_TRACKER_SPREADSHEET_TAB_NAME \"" + QUEST_TRACKER_SPREADSHEET_TAB_NAME + "\" doesn't exist.");
-    valid = false;
+  else if (typeof spreadsheet !== "undefined" && spreadsheet.getSheetByName(SPREADSHEET_TAB_NAME) === null) {
+    spreadsheet.insertSheet(SPREADSHEET_TAB_NAME);
+    logWarning("SPREADSHEET_TAB_NAME \"" + SPREADSHEET_TAB_NAME + "\" didn't exist and was created.");
   }
 
   if (!valid) {
-    logInfo("Please fix the above errors, create a new version of the deployment, and run the doOneTimeSetup() function again.\nIf you aren't sure how to do this, see \"Changing the Settings\" in the documentation for this script.");
+    logInfo("Please fix the above errors, create a new version of the deployment, and click \"Install\" again.\nIf you aren't sure how to do this, see \"Updating options\" in the documentation for this script.");
   }
 
   return valid;
@@ -221,7 +221,7 @@ function testCredentials() {
   // [Authors] This function tests the user credentials
 
   try {
-    api_getParty(true);
+    api_getPartyMembers();
   }
   catch (error) {
     if (error.message.startsWith("Request failed") && error.cause.getResponseCode() == 401) {

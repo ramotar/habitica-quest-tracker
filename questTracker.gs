@@ -1,18 +1,12 @@
 /**
+ * Functionality ported from
  * Quest Tracker v1.0.17 (beta) by @bumbleshoot
- *
- * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/quest-tracker
  */
-
-const QUEST_TRACKER_SPREADSHEET_URL = "";
-const QUEST_TRACKER_SPREADSHEET_TAB_NAME = "Sheet1";
 
 /*************************************\
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
-
-let members;
 
 /**
  * getQuestData()
@@ -20,7 +14,7 @@ let members;
  * Gathers relevant quest data from Habitica's API, arranges it
  * in a JavaScript Object, and returns the object.
  */
-function getQuestData() {
+function getQuestData(members) {
 
   console.log("Getting quest data");
 
@@ -247,36 +241,20 @@ function getQuestData() {
  * Run this function on the questFinished webhook.
  */
 function updateQuestTracker() {
+  if (!validateOptions()) return;
 
   // open spreadsheet & sheet
-  try {
-    var spreadsheet = SpreadsheetApp.openById(QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
-    var sheet = spreadsheet.getSheetByName(QUEST_TRACKER_SPREADSHEET_TAB_NAME);
-
-    // if sheet doesn't exist, print error & exit
-    if (sheet === null) {
-      console.log("ERROR: QUEST_TRACKER_SPREADSHEET_TAB_NAME \"" + QUEST_TRACKER_SPREADSHEET_TAB_NAME + "\" doesn't exit.");
-      return;
-    }
-  }
-  // if spreadsheet doesn't exist, print error & exit
-  catch (e) {
-    if (e.stack.includes("Unexpected error while getting the method or property openById on object SpreadsheetApp")) {
-      console.log("ERROR: QUEST_TRACKER_SPREADSHEET_URL not found: " + QUEST_TRACKER_SPREADSHEET_URL);
-      return;
-    } else {
-      throw e;
-    }
-  }
+  let spreadsheet = SpreadsheetApp.openById(QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
+  let sheet = spreadsheet.getSheetByName(QUEST_TRACKER_SPREADSHEET_TAB_NAME);
 
   // if no party, party = user
-  members = api_getPartyMembers();
+  let members = api_getPartyMembers();
   if (typeof members === "undefined") {
     members = [api_getUser()];
   }
 
   // get quest data
-  let questData = getQuestData();
+  let questData = getQuestData(members);
 
   // sort egg, hatching potion, & pet quests alphabetically by reward name
   questData.eggQuests.sort((a, b) => {

@@ -38,28 +38,25 @@ function doPost(event) {
     const type = dataContents.type;
 
     // Process the webhook
-    processWebhookInstant(type, dataContents);
+    let processingResult = processWebhookInstant(type, dataContents);
 
-    // Check for an existing trigger
-    let triggerId;
-    let triggers = ScriptApp.getProjectTriggers();
-    for (let trigger of triggers) {
-      if (trigger.getHandlerFunction() === "doPostTriggered") {
-        triggerId = trigger.getUniqueId();
-        break;
+    // If processWebhookInstant didn't return false
+    // (indicating, that no delayed processing is necessary)
+    if (processingResult !== false) {
+      let dataString = event.postData.contents;
+
+      // If new data was passed for delayed processing
+      if (typeof processingResult === "object") {
+        dataString = JSON.stringify(processingResult);
       }
-    }
 
-    if (triggerId === undefined) {
       // Create a trigger for delayed processing
-      var trigger = ScriptApp.newTrigger("doPostTriggered").timeBased().after(1).create();
-      triggerId = trigger.getUniqueId();
+      var trigger = ScriptApp.newTrigger('doPostTriggered').timeBased().after(1).create();
+      CacheService.getScriptCache().put(
+        trigger.getUniqueId(),
+        dataString
+      );
     }
-    // Set or update script cache
-    CacheService.getScriptCache().put(
-      triggerId,
-      event.postData.contents
-    );
   }
   catch (error) {
     // To prevent Habitica from shutting down the webhook because it is unresponsive,
