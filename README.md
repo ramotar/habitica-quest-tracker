@@ -4,7 +4,8 @@ The **Quest Tracker** automatically updates a [Google Sheet](https://www.google.
 The spreadsheet shows how many quest completions are needed by each party member for every quest in [Habitica](https://habitica.com/) in order to get all the rewards. It also shows total quest completion percentages for each party member and quest.
 The spreadsheet can be shared with the player's party, so only one party member needs to run this automation (preferably the party leader).
 
-[<img title="Quest Tracker spreadsheet" src="https://github.com/bumbleshoot/quest-tracker/blob/main/quest-tracker.png?raw=true" width="250">](https://github.com/bumbleshoot/quest-tracker/blob/main/quest-tracker.png?raw=true)
+**Preview of the Quest Tracker sheet:**
+![Preview of the Quest Tracker sheet](/quest-tracker.png)
 
 ## Features
 * shows quest completions per party member and quest
